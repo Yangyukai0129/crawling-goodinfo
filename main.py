@@ -34,6 +34,7 @@ class GoodInfo():
                     rows = tr.find_all('tr')
                     odd_rows = []
                     even_rows = []
+
                     for i, row in enumerate(rows):
                         if i == 0:  # 如果是第一個迴圈迭代，跳過
                             continue
