@@ -30,25 +30,34 @@ class GoodInfo():
                     title = tr.find('a').getText()
                     stock_data.update({'stock_name': title})
 
+                    # 資料日期
+                    data_element = tr.find("nobr", string=lambda text: "資料日期" in text)
+                    data_text = data_element.get_text().strip()
+                    # 移除 "資料日期:"
+                    data_text = data_text.replace("資料日期:", "").strip()
+                    stock_data.update({'資料日期': data_text})
+
                     # 其他資料
                     rows = tr.find_all('tr')
                     odd_rows = []
                     even_rows = []
-
                     for i, row in enumerate(rows):
-                        if i == 0:  # 如果是第一個迴圈迭代，跳過
-                            continue
                         # 有些資料沒有使用空白進行分割，導致資料有問題!!!!
                         # text = row.getText().split(' ')
                         if i % 2 == 1:
-                            row_data = [cell.text.strip() for cell in row.find_all(['th', 'td'])]
+                            row_data = [cell.text.strip() for cell in row.find_all(['th', 'td']) if cell.text.strip()]
                             odd_rows.append(row_data)
                         else:
-                            row_data = [cell.text.strip() for cell in row.find_all(['th', 'td'])]
+                            row_data = [cell.text.strip() for cell in row.find_all(['th', 'td']) if cell.text.strip()]
                             even_rows.append(row_data)
                         # print(row.text)
 
+                    skip_row = False  # 初始化標誌
                     for odd, even in zip(odd_rows, even_rows):
+                        # 如果已經標記為要跳過行，則繼續下一次迴圈
+                        if skip_row or any('資料日期' in item for item in odd):
+                            skip_row = False  # 重置標誌
+                            continue                     
                         for i in range(len(odd)):
                             stock_data[even[i]] = odd[i]
                     
@@ -62,4 +71,4 @@ class GoodInfo():
 
 if __name__ == "__main__":
     GoodInfo = GoodInfo()
-    GoodInfo.search('2330,1101')
+    GoodInfo.search('2330,1101,1268')
